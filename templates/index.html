@@ -1,0 +1,17 @@
+{{ define "index" }}
+<html>
+  <head>
+    <title>Chat</title>
+    <script src="https://unpkg.com/htmx.org@2.0.3"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/sse.js"></script>
+  </head>
+
+  <body>
+    {{ if eq .content "welcome" }}
+      {{ template "welcome" }}
+    {{ else }}
+      <h1>You should not see me</h1>
+    {{ end }}
+  </body>
+</html>
+{{ end }}

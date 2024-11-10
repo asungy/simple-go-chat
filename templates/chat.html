@@ -1,0 +1,10 @@
+{{ define "chat" }}
+<div id="chat">
+  <h1>Hi, {{ .name }}! You have entered the chat</h1>
+  <form hx-post="/message" hx-swap="none" hx-on::after-request="this.reset()">
+    <span>Message: </span>
+    <input type="text" name="message"/>
+    <button type="submit">Send</button>
+  </form>
+</div>
+{{ end }}
