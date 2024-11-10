@@ -1,6 +1,7 @@
 package main
 
 import (
+	"time"
 	"fmt"
 	"html/template"
 	"log"
@@ -33,14 +34,15 @@ func main() {
 		log.Fatalf("Error parsing template files: %v", err)
 	}
 
-	http.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		name, err := r.Cookie("Name")
 		if err != nil {
 			tmpl.ExecuteTemplate(w, "index", map[string]any{
 				"content": "welcome",
 			})
 		} else {
-			tmpl.ExecuteTemplate(w, "chat", map[string]any{
+			tmpl.ExecuteTemplate(w, "index", map[string]any{
+				"content": "chat",
 				"name": name.Value,
 			})
 		}
@@ -66,6 +68,26 @@ func main() {
 		messagesLock.Lock()
 		messages = append(messages, r.PostFormValue("message"))
 		messagesLock.Unlock()
+	})
+
+	http.HandleFunc("/events", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/event-stream")
+		w.Header().Set("Cache-Control", "no-cache")
+		w.Header().Set("Connection", "keep-alive")
+
+		flusher, ok := w.(http.Flusher)
+		if !ok {
+			http.Error(w, "Streaming unsupported!", http.StatusInternalServerError)
+			return
+		}
+
+		i := 1
+		for {
+			fmt.Fprintf(w, "data: <div>Message %d at %s</div>\n\n", i, time.Now().Format(time.RFC3339))
+			flusher.Flush()
+			time.Sleep(1 * time.Second)
+			i += 1
+		}
 	})
 
 	fmt.Printf("Running server on: %s\n", addr)

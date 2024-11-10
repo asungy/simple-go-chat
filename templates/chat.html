@@ -1,6 +1,12 @@
 {{ define "chat" }}
 <div id="chat">
   <h1>Hi, {{ .name }}! You have entered the chat</h1>
+
+  <div hx-ext="sse" sse-connect="/events" sse-swap="message">
+    Contents of this box will be updated in real time
+    with every SSE message received from the chatroom.
+  </div>
+
   <form hx-post="/message" hx-swap="none" hx-on::after-request="this.reset()">
     <span>Message: </span>
     <input type="text" name="message"/>
